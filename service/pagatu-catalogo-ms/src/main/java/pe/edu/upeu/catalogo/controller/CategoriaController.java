@@ -14,12 +14,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import lombok.extern.slf4j.Slf4j;
 import pe.edu.upeu.catalogo.dto.CategoriaRequest;
 import pe.edu.upeu.catalogo.dto.CategoriaResponse;
 import pe.edu.upeu.catalogo.service.CategoriaService;
 
+@Slf4j
 @RestController
-@RequestMapping("/api/categorias")
+@RequestMapping("/api/v1/categorias")
 @RequiredArgsConstructor
 public class CategoriaController {
 
@@ -27,6 +29,7 @@ public class CategoriaController {
 
     @GetMapping
     public List<CategoriaResponse> listar() {
+        log.info("Listando categorías");
         return categoriaService.listar();
     }
 
