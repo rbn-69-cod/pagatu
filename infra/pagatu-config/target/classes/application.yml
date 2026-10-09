@@ -10,5 +10,13 @@ spring:
     config:
       server:
         native:
-          search-locations: classpath:/config-repo,file:./config-repo
+          search-locations: ${CONFIG_REPO_LOCATION:file:./config-repo}
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
