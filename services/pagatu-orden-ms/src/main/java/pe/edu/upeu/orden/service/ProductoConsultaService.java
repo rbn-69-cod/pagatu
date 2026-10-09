@@ -23,4 +23,24 @@ public class ProductoConsultaService {
         log.warn("[CATALOGO] Fallback activado para idProducto {}. Motivo: {}", idProducto, ex.getMessage());
         return null;
     }
+
+    @CircuitBreaker(name = "catalogo", fallbackMethod = "fallbackDescontarStock")
+    public boolean descontarStock(Long idProducto, Integer cantidad) {
+        productoClient.descontarStock(idProducto, cantidad);
+        return true;
+    }
+
+    public boolean fallbackDescontarStock(Long idProducto, Integer cantidad, Throwable ex) {
+        log.warn("[CATALOGO] Fallback al descontar stock para idProducto {}. Motivo: {}", idProducto, ex.getMessage());
+        return false;
+    }
+
+    @CircuitBreaker(name = "catalogo", fallbackMethod = "fallbackRestaurarStock")
+    public void restaurarStock(Long idProducto, Integer cantidad) {
+        productoClient.restaurarStock(idProducto, cantidad);
+    }
+
+    public void fallbackRestaurarStock(Long idProducto, Integer cantidad, Throwable ex) {
+        log.warn("[CATALOGO] Fallback al restaurar stock para idProducto {}. Motivo: {}", idProducto, ex.getMessage());
+    }
 }

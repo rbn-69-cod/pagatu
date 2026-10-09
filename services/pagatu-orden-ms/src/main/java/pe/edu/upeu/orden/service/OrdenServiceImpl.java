@@ -41,7 +41,10 @@ public class OrdenServiceImpl implements OrdenService {
         for (DetalleOrdenRequest item : request.getDetalles()) {
             ProductoDto producto = productoConsultaService.consultarProducto(item.getIdProducto());
 
-            if (producto == null) {
+            boolean stockReservado = (producto != null)
+                    && productoConsultaService.descontarStock(item.getIdProducto(), item.getCantidad());
+
+            if (!stockReservado) {
                 validacionCompleta = false;
                 detalles.add(OrdenDetalle.builder()
                         .orden(orden)
@@ -96,6 +99,25 @@ public class OrdenServiceImpl implements OrdenService {
         }
         orden.setEstado(EstadoOrden.PAGADA);
         log.info("component=processor ordenId={} estado={} status=processed", ordenId, orden.getEstado());
+    }
+
+    @Override
+    @Transactional
+    public void compensar(Long ordenId) {
+        Orden orden = ordenRepository.findById(ordenId).orElse(null);
+        if (orden == null || orden.getEstado() != EstadoOrden.PENDIENTE_PAGO) {
+            log.warn("component=processor ordenId={} status=ignored motivo=\"la orden no existe o ya no esta pendiente de pago\"", ordenId);
+            return;
+        }
+
+        for (OrdenDetalle d : orden.getDetalles()) {
+            if (d.getIdProducto() != null && d.getCantidad() != null) {
+                productoConsultaService.restaurarStock(d.getIdProducto(), d.getCantidad());
+            }
+        }
+
+        orden.setEstado(EstadoOrden.CANCELADA);
+        log.info("component=processor ordenId={} estado={} status=compensated", ordenId, orden.getEstado());
     }
 
     @Override

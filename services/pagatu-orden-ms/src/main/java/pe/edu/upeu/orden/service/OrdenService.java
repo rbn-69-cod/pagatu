@@ -7,6 +7,7 @@ import java.util.List;
 public interface OrdenService {
     OrdenResponse crear(OrdenRequest request, Long idCliente);
     void marcarPagada(Long ordenId);
+    void compensar(Long ordenId);
     OrdenResponse findById(Long id);
     List<OrdenResponse> listar();
 }

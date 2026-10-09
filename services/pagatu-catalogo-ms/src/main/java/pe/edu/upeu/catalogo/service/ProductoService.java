@@ -52,6 +52,24 @@ public class ProductoService {
         productoRepository.delete(buscarOFallar(id));
     }
 
+    @org.springframework.transaction.annotation.Transactional
+    public void descontarStock(Long id, Integer cantidad) {
+        Producto producto = buscarOFallar(id);
+        if (producto.getStock() < cantidad) {
+            throw new pe.edu.upeu.catalogo.exception.StockInsuficienteException(
+                    "Stock insuficiente para producto " + id + ": disponible " + producto.getStock() + ", solicitado " + cantidad);
+        }
+        producto.setStock(producto.getStock() - cantidad);
+        productoRepository.save(producto);
+    }
+
+    @org.springframework.transaction.annotation.Transactional
+    public void restaurarStock(Long id, Integer cantidad) {
+        Producto producto = buscarOFallar(id);
+        producto.setStock(producto.getStock() + cantidad);
+        productoRepository.save(producto);
+    }
+
     private Producto buscarOFallar(Long id) {
         return productoRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Producto no encontrado: " + id));
