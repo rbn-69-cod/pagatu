@@ -42,9 +42,8 @@ management:
 
 eureka:
   instance:
-    hostname: localhost
+    hostname: localhost 
     instance-id: ${spring.application.name}:${server.port}
   client:
     service-url:
       defaultZone: http://localhost:18761/eureka
-

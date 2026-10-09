@@ -3,9 +3,9 @@ server:
 
 spring:
   datasource:
-    url: jdbc:postgresql://pagatu-postgres-catalogo:5432/pagatu_catalogo_db
-    username: pagatu
-    password: pagatu
+    url: jdbc:postgresql://${DB_HOST}:${DB_PORT}/${DB_NAME}
+    username: ${DB_USER}
+    password: ${DB_PASS}
     driver-class-name: org.postgresql.Driver
   flyway:
     enabled: true
@@ -14,6 +14,15 @@ spring:
     hibernate:
       ddl-auto: validate
     show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+
+springdoc:
+  swagger-ui:
+    enabled: false
+  api-docs:
+    enabled: false
 
 management:
   endpoints:
@@ -23,11 +32,9 @@ management:
   endpoint:
     health:
       show-details: never
-
 eureka:
   instance:
     instance-id: ${spring.application.name}:${random.value}
   client:
     service-url:
       defaultZone: http://pagatu-eureka:8761/eureka
-
