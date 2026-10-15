@@ -9,3 +9,4 @@ public interface ClienteService {
     ClienteResponse obtener(Long id);
     ClienteResponse crear(ClienteRequest request);
 }
+

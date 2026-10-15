@@ -5,3 +5,4 @@ spring:
     active: dev
   config:
     import: "optional:configserver:${CONFIG_SERVER_URL:http://localhost:18888}"
+

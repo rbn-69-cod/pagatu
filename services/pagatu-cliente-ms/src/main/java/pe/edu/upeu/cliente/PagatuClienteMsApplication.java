@@ -11,3 +11,4 @@ public class PagatuClienteMsApplication {
         SpringApplication.run(PagatuClienteMsApplication.class, args);
     }
 }
+
