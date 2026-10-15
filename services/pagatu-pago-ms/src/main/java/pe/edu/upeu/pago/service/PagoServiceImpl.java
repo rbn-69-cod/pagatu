@@ -18,6 +18,7 @@ import pe.edu.upeu.pago.repository.PagoRepository;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
+import org.springframework.dao.DataIntegrityViolationException;
 
 import org.springframework.dao.DataIntegrityViolationException;
 
@@ -36,6 +37,9 @@ public class PagoServiceImpl implements PagoService {
 
     @Value("${spring.application.name}")
     private String nombreServicio;
+
+    private static final String PAGO_FALLIDO = "pago.fallido";
+    private static final String METODO_RECHAZADO = "TARJETA_RECHAZADA";
 
     @Override
     @Transactional

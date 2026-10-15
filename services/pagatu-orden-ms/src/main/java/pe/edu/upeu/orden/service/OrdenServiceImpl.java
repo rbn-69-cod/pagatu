@@ -28,7 +28,7 @@ public class OrdenServiceImpl implements OrdenService {
 
     @Override
     @Transactional
-    public OrdenResponse crear(OrdenRequest request, Long idCliente) {
+    public OrdenResponse crear(OrdenRequest request, String idCliente) {
         Orden orden = Orden.builder()
                 .idCliente(idCliente)
                 .metodoPago(request.getMetodoPago())
@@ -40,8 +40,7 @@ public class OrdenServiceImpl implements OrdenService {
 
         for (DetalleOrdenRequest item : request.getDetalles()) {
             ProductoDto producto = productoConsultaService.consultarProducto(item.getIdProducto());
-
-            boolean stockReservado = (producto != null)
+            boolean stockReservado = producto != null
                     && productoConsultaService.descontarStock(item.getIdProducto(), item.getCantidad());
 
             if (!stockReservado) {
@@ -102,25 +101,6 @@ public class OrdenServiceImpl implements OrdenService {
     }
 
     @Override
-    @Transactional
-    public void compensar(Long ordenId) {
-        Orden orden = ordenRepository.findById(ordenId).orElse(null);
-        if (orden == null || orden.getEstado() != EstadoOrden.PENDIENTE_PAGO) {
-            log.warn("component=processor ordenId={} status=ignored motivo=\"la orden no existe o ya no esta pendiente de pago\"", ordenId);
-            return;
-        }
-
-        for (OrdenDetalle d : orden.getDetalles()) {
-            if (d.getIdProducto() != null && d.getCantidad() != null) {
-                productoConsultaService.restaurarStock(d.getIdProducto(), d.getCantidad());
-            }
-        }
-
-        orden.setEstado(EstadoOrden.CANCELADA);
-        log.info("component=processor ordenId={} estado={} status=compensated", ordenId, orden.getEstado());
-    }
-
-    @Override
     @Transactional(readOnly = true)
     public OrdenResponse findById(Long id) {
         Orden orden = ordenRepository.findById(id)
@@ -158,4 +138,20 @@ public class OrdenServiceImpl implements OrdenService {
                 .detalles(detalles)
                 .build();
     }
+
+    @Override
+    @Transactional
+    public void compensar(Long ordenId) {
+        Orden orden = ordenRepository.findById(ordenId).orElse(null);
+        if (orden == null || orden.getEstado() != EstadoOrden.PENDIENTE_PAGO) {
+            log.warn("component=processor ordenId={} status=ignored motivo=\"la orden no existe o ya no esta pendiente de pago\"", ordenId);
+            return;
+        }
+        for (OrdenDetalle detalle : orden.getDetalles()) {
+            productoConsultaService.restaurarStock(detalle.getIdProducto(), detalle.getCantidad());
+        }
+        orden.setEstado(EstadoOrden.CANCELADA);
+        log.info("component=processor ordenId={} estado={} status=compensated", ordenId, orden.getEstado());
+    }
+
 }

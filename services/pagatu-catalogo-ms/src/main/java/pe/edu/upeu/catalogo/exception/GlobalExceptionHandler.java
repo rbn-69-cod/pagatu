@@ -32,7 +32,7 @@ public class GlobalExceptionHandler {
         body.put("message", "Error de validación en los datos enviados");
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
     }
-
+    
     @ExceptionHandler(StockInsuficienteException.class)
     public ResponseEntity<Map<String, Object>> handleStockInsuficiente(StockInsuficienteException ex) {
         Map<String, Object> body = new HashMap<>();
@@ -42,4 +42,5 @@ public class GlobalExceptionHandler {
         body.put("message", ex.getMessage());
         return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
     }
+
 }

@@ -5,9 +5,11 @@ import pe.edu.upeu.orden.dto.OrdenResponse;
 import java.util.List;
 
 public interface OrdenService {
-    OrdenResponse crear(OrdenRequest request, Long idCliente);
+    OrdenResponse crear(OrdenRequest request, String idCliente);
     void marcarPagada(Long ordenId);
     void compensar(Long ordenId);
     OrdenResponse findById(Long id);
     List<OrdenResponse> listar();
+
+    void compensar(Long ordenId);    
 }

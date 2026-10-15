@@ -31,16 +31,18 @@ public class ProductoConsultaService {
     }
 
     public boolean fallbackDescontarStock(Long idProducto, Integer cantidad, Throwable ex) {
-        log.warn("[CATALOGO] Fallback al descontar stock para idProducto {}. Motivo: {}", idProducto, ex.getMessage());
+        log.warn("[CATALOGO] No se pudo descontar stock de {}. Motivo: {}", idProducto, ex.getMessage());
         return false;
     }
-
+    
     @CircuitBreaker(name = "catalogo", fallbackMethod = "fallbackRestaurarStock")
     public void restaurarStock(Long idProducto, Integer cantidad) {
         productoClient.restaurarStock(idProducto, cantidad);
     }
 
     public void fallbackRestaurarStock(Long idProducto, Integer cantidad, Throwable ex) {
-        log.warn("[CATALOGO] Fallback al restaurar stock para idProducto {}. Motivo: {}", idProducto, ex.getMessage());
+        log.error("[CATALOGO] No se pudo restaurar stock de {} al compensar. Motivo: {} — requiere correccion manual",
+                idProducto, ex.getMessage());
     }
+
 }

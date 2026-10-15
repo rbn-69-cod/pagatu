@@ -20,6 +20,8 @@ spring:
   devtools:
     restart:
       enabled: true
+      quiet-period: 2s
+      poll-interval: 3s
     livereload:
       enabled: true
 
@@ -39,6 +41,13 @@ management:
   endpoint:
     health:
       show-details: always
+      probes:
+        enabled: true
+      group:
+        liveness:
+          include: livenessState
+        readiness:
+          include: readinessState, db
 
 eureka:
   instance:
