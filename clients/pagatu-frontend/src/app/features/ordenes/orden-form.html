@@ -1,0 +1,53 @@
+<h2>Crear Nueva Orden</h2>
+
+@if (error()) {
+  <div style="background: #fee2e2; border: 1px solid #f87171; color: #991b1b; padding: 0.75rem; border-radius: 0.25rem; margin-bottom: 1rem;">
+    {{ error() }}
+  </div>
+}
+
+@if (ordenCreada()) {
+  <div class="alert-success">
+    <h3>Orden Registrada Exitosamente (ID #{{ ordenCreada()?.id }})</h3>
+    <p>Estado inicial: <span class="status-badge">{{ ordenCreada()?.estado }}</span></p>
+    <p>Total: S/ {{ ordenCreada()?.total | number:'1.2-2' }}</p>
+    <p style="font-size: 0.9rem; color: #4b5563;">
+      * Nota: La orden se registró en estado <strong>PENDIENTE_PAGO</strong>. En una arquitectura orientada a eventos, el pago se procesa asíncronamente con Kafka.
+    </p>
+    <div style="margin-top: 1rem;">
+      <a routerLink="/pedidos" style="display: inline-block; padding: 0.5rem 1rem; background: #059669; color: white; text-decoration: none; border-radius: 0.25rem; font-weight: bold;">
+        Ver en "Mis Pedidos" (Seguimiento en Vivo) &rarr;
+      </a>
+    </div>
+  </div>
+} @else {
+  <form (ngSubmit)="crearOrden()">
+    <div class="form-group">
+      <label for="producto">Producto:</label>
+      <select id="producto" [ngModel]="idProductoSeleccionado()" (ngModelChange)="idProductoSeleccionado.set($event)" name="idProducto">
+        @for (prod of productos(); track prod.id) {
+          <option [value]="prod.id">{{ prod.nombre }} - S/ {{ prod.precio | number:'1.2-2' }} (Stock: {{ prod.stock }})</option>
+        }
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="cantidad">Cantidad:</label>
+      <input type="number" id="cantidad" [ngModel]="cantidad()" (ngModelChange)="cantidad.set($event)" name="cantidad" min="1" max="100" />
+    </div>
+
+    <div class="form-group">
+      <label for="metodoPago">Método de Pago:</label>
+      <select id="metodoPago" [ngModel]="metodoPago()" (ngModelChange)="metodoPago.set($event)" name="metodoPago">
+        <option value="YAPE_PLIN">YAPE_PLIN (Pago Feliz &rarr; PAGADA)</option>
+        <option value="TARJETA">TARJETA (Pago Feliz &rarr; PAGADA)</option>
+        <option value="TARJETA_RECHAZADA">TARJETA_RECHAZADA (Prueba de Rechazo S09/S11 &rarr; CANCELADA)</option>
+      </select>
+    </div>
+
+    <button type="submit" [disabled]="guardando() || productos().length === 0">
+      {{ guardando() ? 'Registrando Orden...' : 'Confirmar Orden' }}
+    </button>
+  </form>
+}
+

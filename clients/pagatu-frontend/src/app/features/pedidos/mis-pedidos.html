@@ -1,0 +1,65 @@
+<div style="display: flex; justify-content: space-between; align-items: center;">
+  <h2>Mis Pedidos</h2>
+  <a routerLink="/ordenes/nueva" style="padding: 0.5rem 1rem; background-color: #2563eb; color: white; text-decoration: none; border-radius: 0.25rem; font-weight: 500;">
+    + Nueva Orden
+  </a>
+</div>
+
+<p style="color: #6b7280; font-size: 0.95rem;">
+  Monitoreo en vivo de consistencia eventual: las órdenes en estado <strong>PENDIENTE_PAGO</strong> se sondean cada 3s hasta transicionar a <strong>PAGADA</strong> o <strong>CANCELADA</strong>.
+</p>
+
+@if (cargando()) {
+  <p>Cargando órdenes...</p>
+} @else if (pedidos().length === 0) {
+  <div style="padding: 2rem; text-align: center; background: #f9fafb; border: 1px dashed #d1d5db; border-radius: 0.5rem; margin-top: 1rem;">
+    <p>Aún no has registrado ninguna orden.</p>
+    <a routerLink="/ordenes/nueva" style="color: #2563eb; font-weight: bold;">Crear mi primera orden &rarr;</a>
+  </div>
+} @else {
+  <table>
+    <thead>
+      <tr>
+        <th>N° Orden</th>
+        <th>Fecha Creación</th>
+        <th>Total</th>
+        <th>Estado de la Orden</th>
+        <th>Detalle / Método Pago</th>
+        <th>Fecha de Pago</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (item of pedidos(); track item.orden.id) {
+        <tr>
+          <td><strong>#{{ item.orden.id }}</strong></td>
+          <td>{{ item.orden.fechaCreacion | date:'dd/MM/yyyy HH:mm:ss' }}</td>
+          <td>S/ {{ item.orden.total | number:'1.2-2' }}</td>
+          <td>
+            @if (item.orden.estado === 'PENDIENTE_PAGO') {
+              <span class="badge-pending">Procesando pago...</span>
+            } @else if (item.orden.estado === 'PAGADA') {
+              <span class="badge-paid">PAGADA</span>
+            } @else if (item.orden.estado === 'CANCELADA') {
+              <span class="badge-canceled">CANCELADA (Rechazado)</span>
+            } @else {
+              <span>{{ item.orden.estado }}</span>
+            }
+          </td>
+          <td>
+            @if (item.pago) {
+              <span>{{ item.pago.metodoPago }} (Estado Pago: {{ item.pago.estado }})</span>
+            } @else if (item.orden.estado === 'PENDIENTE_PAGO') {
+              <span style="color: #9ca3af; font-style: italic;">Esperando confirmación Kafka...</span>
+            } @else {
+              <span style="color: #6b7280;">-</span>
+            }
+          </td>
+          <td>
+            {{ item.pago?.fechaPago ? (item.pago?.fechaPago | date:'dd/MM/yyyy HH:mm:ss') : '-' }}
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+}
+

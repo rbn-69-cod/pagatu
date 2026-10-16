@@ -38,9 +38,6 @@ public class PagoServiceImpl implements PagoService {
     @Value("${spring.application.name}")
     private String nombreServicio;
 
-    private static final String PAGO_FALLIDO = "pago.fallido";
-    private static final String METODO_RECHAZADO = "TARJETA_RECHAZADA";
-
     @Override
     @Transactional
     public void procesar(OrdenCreadaEvento orden) {
@@ -91,6 +88,11 @@ public class PagoServiceImpl implements PagoService {
     @Override
     public PagoResponse obtener(Long id) {
         return pagoMapper.toResponse(buscarOFallar(id));
+    }
+
+    @Override
+    public java.util.Optional<PagoResponse> buscarPorOrden(Long ordenId) {
+        return pagoRepository.findByOrdenId(ordenId).map(pagoMapper::toResponse);
     }
 
     private Pago buscarOFallar(Long id) {

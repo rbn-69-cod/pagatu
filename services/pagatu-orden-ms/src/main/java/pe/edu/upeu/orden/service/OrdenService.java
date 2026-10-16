@@ -10,6 +10,4 @@ public interface OrdenService {
     void compensar(Long ordenId);
     OrdenResponse findById(Long id);
     List<OrdenResponse> listar();
-
-    void compensar(Long ordenId);    
 }
